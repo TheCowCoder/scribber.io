@@ -1,71 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Racle</title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scribber</title>
 
 
-    <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
-    <link rel="manifest" href="assets/favicon/site.webmanifest">
-    <link rel="mask-icon" href="assets/favicon/safari-pinned-tab.svg" color="#0087e5">
-    <link rel="shortcut icon" href="assets/favicon/favicon.ico">
-    <meta name="msapplication-TileColor" content="#2d89ef">
-    <meta name="msapplication-config" content="assets/favicon/browserconfig.xml">
-    <meta name="theme-color" content="#ffffff">
+  <!-- Favicon -->
+  <!-- TODO -->
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="../css/index.css" />
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/index.css" />
 
     
 </head>
 <body>
-    <div class="console" id="console">
-        <div class="controls top">Console</div>
-        <div class="controls bottom right"></div>
-
-        <span class="console output">Console started!</br></span>
-    </div>
-
-    <div id="header">
-        <span id="title">Racle</span>
-        <div id="room-options">
-            <button id="start-btn">Start!</button>
-        </div>
-    </div>
-
-    <div class="page visible" id="home-page">
-        <div id="center">
-            <button id="create-btn">Create room</button>
-            <button id="join-btn">Join room</button>
-        </div>
-    </div>
-
-    <div class="page" id="game-page">
-        <div id="scores">
-        </div>
-        <div id="games">
-            <div id="other-games-left">
-            </div>
-            <div id="main-game">
-            </div>
-            <div id="other-games-right">
-            </div>
-        </div>
-    </div>
-
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/SocketManager.js"></script>
-    <!-- <script src="js/console.js"></script> -->
-    <script src="js/game/Letter.js"></script>
-    <script src="js/game/Game.js"></script>
-    <script src="js/game/OtherGame.js"></script>
-    <script src="js/index.js"></script>
+  <button id="createRoomBtn">Create room</button>
+  <button id="joinRoomBtn">Join room</button>
+  
+  <!-- JS -->
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <script src="js/main.js"></script>
+  <script src="js/SocketManager.js"></script>
+  
+  <script src="js/index.js"></script>
 </body>
 </html>

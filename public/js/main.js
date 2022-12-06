@@ -1,10 +1,10 @@
-let id = (id) => {
+const id = (id) => {
     return document.getElementById(id);
 }
-let cl = (className) => {
+const cl = (className) => {
     return document.getElementsByClassName(className)[0];
 }
-let clAll = (className) => {
+const clAll = (className) => {
     return document.getElementsByClassName(className);
 }
 

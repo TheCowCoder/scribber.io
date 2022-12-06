@@ -1,197 +1,103 @@
 class SocketManager {
-    constructor(eventHandler) {
-        this.socket = io({ reconnection: false });
-        this.eventHandler = eventHandler;
+  constructor() {
+    this.socket = io({ reconnection: false });
 
-        this.room = null;
+    this.room = null;
 
-        this.socket.on("connect", this.onConnect.bind(this));
-        this.socket.on("player join", this.onPlayerJoin.bind(this));
-        this.socket.on("player leave", this.onPlayerLeave.bind(this));
-        this.socket.on("game started", this.onGameStarted.bind(this));
-        this.socket.on("username", this.onUsername.bind(this));
-        this.socket.on("guess", this.onGuess.bind(this));
-        this.socket.on("word guessed", this.onWordGuessed.bind(this));
-        this.socket.on("score", this.onScore.bind(this));
-        this.socket.on("word lost", this.onWordLost.bind(this));
-        this.socket.on("win", this.onWin.bind(this));
-        this.socket.on("reset", this.onReset.bind(this));
-        this.socket.on("update guess", this.onUpdateGuess.bind(this));
-        this.socket.on("set score", this.onSetScore.bind(this));
-    }
+    const onevent = this.socket.onevent;
+    this.socket.onevent = (packet) => {
+        const args = packet.data || [];
+        onevent.call(this, packet);
+        packet.data = ["*"].concat(args);
+        onevent.call(this, packet);
+    };
 
-    // Utils
-    getPlayer() {
-        return this.room.players[this.socket.id];
-    }
-    
+    socket.on("*", this.receiveEvent.bind(this));
 
-    // Recieve from server
+    // this.socket.on("connect", this.onConnect.bind(this));
+    // this.socket.on("playerJoin", this.onPlayerJoin.bind(this));
+    // this.socket.on("playerLeave", this.onPlayerLeave.bind(this));
+    // this.socket.on("gameStart", this.onGameStart.bind(this));
 
-    onSetScore(socketID, score) {
-        const player = this.room.players[socketID];
-        player.score = score;
-        this.eventHandler("set score", player);
-    }
+    this.events = {};
+  }
 
-    onUpdateGuess(socketID, guess) {
-        const player = this.room.players[socketID];
+  addEventListener(event, callback) {
+    this.events[event] = callback;
+  }
 
-        console.log("got update guess", player.username, guess);
-        // player.guess = guess;
-
-        this.eventHandler("update guess", {
-            player: player,
-            guess: guess
-        });
-    }
-
-    onReset(room) {
-        console.log("RESET!", room);
-   
-        // this.room = room;
-        this.eventHandler("reset", room);
-    }
-
-    onWin(socketID) {
-        const player = this.room.players[socketID];
-        console.log(player.username, "WON!!");
+  // Utils
+  getPlayer() {
+    return this.room.players[this.socket.id];
+  }
 
 
+  // Recieve from server
+  receiveEvent(event, ...args) {
+    console.log("[SocketManager] receive", event, args);
+    if (this.events[event]) this.events[event](...args);
 
-        this.eventHandler("win", player);
-    }
+    console.log("got event", "on" + event[0].toUpperCase() + event.slice(1));
+    // this["on" + event[0].toUpperCase() + event.slice(1)]
+  }
+  
+  onConnect() {
+    console.log("[SocketManager] [receive] onConnect");
+  }
 
-    onWordLost(socketID) {
-        const player = this.room.players[socketID];
-        console.log(player.username, "Lost the word!");
+  onPlayerJoin(player, room) {
+    console.log("[SocketManager] [receive] onPlayerJoin", player, room);
 
-        this.eventHandler("word lost", player);
-    }
+    this.room = room;
+  }
 
-    onScore(socketID, scoredResult) {
-        const player = this.room.players[socketID];
-        console.log("Got score", scoredResult, player.username);
-        player.score.push.apply(player.score, scoredResult);
-        this.eventHandler("score", player);
-    }
+  onPlayerLeave(player, room) {
+    console.log("[SocketManager] [receive] onPlayerLeave", player, room);
 
-    onWordGuessed(socketID) {
-        const player = this.room.players[socketID];
-        console.log(player.username, "Guessed the word!");
+    this.room = room;
+  }
 
-        this.eventHandler("word guessed", player);
-    }
+  onGameStart(room) {
+    console.log("[SocketManager] [receive] onGameStart", room);
 
+    this.room = room;
+  }
 
-    onGuess(socketID, result, scoredResult) {
-        const player = this.room.players[socketID];
-        console.log("Guess recieved");
+  // Send to server
+  sendEvent(event, ...args) {
+    return new Promise((resolve, reject) => {
+      this.socket.emit("startGame", ...args, (result) => {
+        console.log("[SocketManager] [send]", event, ...args, result);
+        if (!result.success) {
+          console.log("[SocketManager] [ERROR]", event);
+          return reject(result);
+        }
 
+        if (result.room) {
+          this.room = result.room;
+        }
+        return resolve(result);
+      });
+    });
+  }
+  
+  async startGame() {
+    const result = await this.sendEvent("startGame");
+    return result;
+  }
 
-        player.board[player.guessIndex] = result;
+  async resetGame() {
+    const result = await this.sendEvent("resetGame");
+    return result;
+  }
 
-        player.guessIndex ++;
+  async createRoom() {
+    const result = await this.sendEvent("createRoom");
+    return result;
+  }
 
-        player.guess = "";
-
-        this.eventHandler("guess", player);
-    }
-
-    onConnect() {
-        console.log("Connected to server!");
-        this.socket.emit("join", (result) => {
-            console.log("Joined server!", result);
-            // this.setUsername("keed")
-            this.eventHandler("joined");
-        });
-    }
-
-    onPlayerJoin(player) {
-        console.log("player join", player);
-        
-        this.room.players[player.socketID] = player;
-
-        this.eventHandler("player join", player);
-    }
-    onPlayerLeave(socketID) {
-        console.log("leave", socketID);
-        let player = this.room.players[socketID];
-        console.log("player leave", player);
-        
-        delete this.room.players[player.socketID];
-
-        this.eventHandler("player leave", player);
-    }
-
-    onGameStarted() {
-        console.log("Recieved game start!");
-        this.room.state = "in progress";
-        this.getPlayer().score = [];
-        this.eventHandler("game started");
-    }
-
-    onUsername(socketID, username) {
-        console.log("got username", username);
-        const player = this.room.players[socketID];
-        player.username = username;
-        this.eventHandler("username", player);
-    }
-
-    // Send to server
-
-    updateGuess(guess) {
-        this.socket.emit("update guess", guess, (result) => {
-
-        });
-    }
-
-    resetGame() {
-        this.socket.emit("reset", (result) => {
-            // if (result.success) this.room.state = "in progress";
-
-            console.log("Game was reset.", result);
-        });
-    }
-
-    submitGuess(guess, callback) {
-        console.log("Guessing:", guess);
-        this.socket.emit("guess", guess, (result) => {
-            console.log("Got guess result:", result);
-            
-            return callback(result);
-        });
-    }
-
-    startGame() {
-        this.socket.emit("start game", (result) => {
-            // if (result.success) this.room.state = "in progress";
-
-            console.log("Game was started.");
-        });
-    }
-
-    setUsername(username, callback) {
-        this.socket.emit("username", username, (result) => {
-            console.log("Success set username");
-            if (callback) return callback(result);
-        });
-    }
-
-    joinRoom(roomID) {
-        this.socket.emit("join room", roomID, (result) => {
-            if (result.success) this.room = result.room;
-
-            this.eventHandler("join room", result);
-        });
-    }
-
-    createRoom() {
-        this.socket.emit("create room", (result) => {
-            if (result.success) this.room = result.room;
-
-            this.eventHandler("join room", result);
-        });
-    }
-
+  async joinRoom(roomId) {
+    const result = await this.sendEvent("joinRoom", roomId);
+    return result;
+  }
 }

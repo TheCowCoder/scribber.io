@@ -1,91 +1,92 @@
 const Utils = require("./Utils.js");
 
 class Room {
-    static rooms = {};
+  static rooms = {};
 
-    static createRoom(host) {
-        // let roomID = makeID(4);
-        let roomID = Utils.randItem(Utils.ALL_WORDS);
-        while (roomID in Room.rooms) roomID = Utils.randItem(Utils.ALL_WORDS);
-        
-        let room = new Room(roomID, host);
-        return room;
+  static makeRoomId() {
+    let roomId = Utils.makeID(4);
+    while (roomId in Room.rooms) roomId = Utils.makeId(4);
+    return roomId;
+  }
 
+  constructor(host) {
+    this.roomId = Room.makeRoomId();
+    this.players = {};
+    this.state = "waiting to start";
+    
+    this.host = host;
+    this.host.joinRoom(this);
+
+    Room.rooms[roomId] = this;
+  }
+
+  getForClient() {
+    let room = {
+      roomID: this.roomID,
+      players: {},
+      state: this.state,
+      host: this.host.getForClient()
+    };
+    
+    for (const socketID in this.players) {
+      const player = this.players[socketID];
+      room.players[socketID] = player.getForClient();
     }
     
-    constructor(roomID, host) {
-        this.roomID = roomID;
-        this.players = {};
-        this.state = "waiting to start";
-        this.host = host;
+    return room;
+  }
 
-        this.words = [];
+  start() {
+    this.state = "in progress";
 
+    for (const socketID in this.players) {
+      const player = this.players[socketID];
 
-        Room.rooms[roomID] = this;
+      player.start();
     }
 
-    reset() {
-        this.state = "waiting to start";
-        this.words = [];
+    this.emit("gameStart");
+  }
 
-        for (let socketID in this.players) {
-            const player = this.players[socketID];
-            player.reset();
-        }
+  reset() {
+    this.state = "waiting to start";
 
+    for (const socketID in this.players) {
+      const player = this.players[socketID];
+      
+      player.reset();
     }
+  }
 
-    gameOver() {
-        this.state = "game over";
-    }
 
-    start() {
-        this.state = "in progress";
-        this.addNewWord();
-        for (let socketID in this.players) {
-            const player = this.players[socketID];
-            const newWord = player.newWord();
-            console.log("New word for player", player.username, newWord);
-        }
+  delete() {
+    for (const socketId in this.players) {
+      this.players[socketId].leaveRoom();
     }
+    delete Room.rooms[this.roomId];
+  }
 
-    getForClient() {
-        let room = {
-            roomID: this.roomID,
-            players: {},
-            state: this.state,
-            host: this.host.getForClient()
-        };
-        for (let socketID in this.players) {
-            const player = this.players[socketID];
-            room.players[socketID] = player.getForClient();
-        }
-        return room;
-    }
 
-    addNewWord() {
-        const newWord = Utils.randItem(Utils.ANSWER_WORDS);
-        // let newWord = "chere";
-        this.words.push(newWord);
-        return newWord;
-    }
+  addPlayer(player) {
+    this.players[player.socket.id] = player;
+    player.room = this;
+  }
+  removePlayer(player) {
+    delete this.players[player.socket.id];
+    player.room = null;
 
-    addPlayer(player) {
-        this.players[player.socket.id] = player;
+    if (Object.keys(this.players).length == 0) {
+      this.delete();
+      console.log("Last player left, deleting this room.");
     }
-    removePlayer(player) {
-        delete this.players[player.socket.id];
-        if (Object.keys(this.players).length == 0) delete Room.rooms[this.roomID];
-    }
+  }
 
-    emit(...args) {
-        for (let socketID in this.players) {
-            const player = this.players[socketID];
-            player.emit(...args);
-        }
+  emit(...args) {
+    for (const socketID in this.players) {
+      const player = this.players[socketID];
+      player.emit(...args);
     }
-
+  }
 }
 
 module.exports = Room;
