@@ -1,0 +1,424 @@
+
+html, body {
+    padding: 0px;
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.anim-jiggle {
+    animation: Jiggle 500ms;
+    /* transform: translate3d(0, 0, 0); */
+}
+.anim-pop {
+    animation: Pop 100ms ease-in;
+}
+.anim-flip-in {
+    animation: FlipIn 100ms ease-in;
+}
+.anim-flip-out {
+    animation: FlipOut 100ms ease-out;
+}
+
+
+@keyframes Pop {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    40% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+@keyframes Jiggle {
+    10%, 90% {
+        transform: translateX(-1px);
+    }
+
+    20%, 80% {
+        transform: translateX(2px);
+    }
+
+    30%, 50%, 70% {
+        transform: translateX(-4px);
+    }
+
+    40%, 60% {
+        transform: translateX(4px);
+    }
+}
+
+@keyframes FlipIn {
+    from {
+        transform: rotateX(0);
+    }
+    to {
+        transform: rotateX(-90deg);
+    }
+}
+
+@keyframes FlipOut {
+    from {
+        transform: rotateX(-90deg);
+    }
+    to {
+        transform: rotateX(0);
+    }
+}
+
+
+/* @keyframes Bounce {
+0%, 20% {
+transform: translateY(0);
+}
+40% {
+transform: translateY(-30px);
+}
+50% {
+transform: translateY(5px);
+}
+60% {
+transform: translateY(-15px);
+}
+80% {
+transform: translateY(2px);
+}
+100% {
+transform: translateY(0);
+}
+}
+@keyframes PopIn {
+    from {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+
+    40% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+  }
+  .tile[data-animation='flip-in'] {
+    animation-name: FlipIn;
+    animation-duration: 250ms;
+    animation-timing-function: ease-in;
+  }
+  @keyframes FlipIn {
+    0% {
+      transform: rotateX(0);
+    }
+    100% {
+      transform: rotateX(-90deg);
+    }
+  }
+  .tile[data-animation='flip-out'] {
+    animation-name: FlipOut;
+    animation-duration: 250ms;
+    animation-timing-function: ease-in;
+  }
+  @keyframes FlipOut {
+    0% {
+      transform: rotateX(-90deg);
+    }
+    100% {
+      transform: rotateX(0);
+    }
+  } */
+/* @keyframes jiggle {
+    10%, 90% {
+        transform: translateX(-1px);
+    }
+
+    20%, 80% {
+        transform: translateX(2px);
+    }
+
+    30%, 50%, 70% {
+        transform: translateX(-4px);
+    }
+
+    40%, 60% {
+        transform: translateX(4px);
+    }
+} */
+
+
+
+#scores {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    /* width: -webkit-fill-available; */
+    width: calc(100% - 40px);
+
+}
+.score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    /* flex-grow: 1; */
+    /* background-color: gold; */
+}
+.finish {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.finish > img {
+    height: 40px;
+}
+.score-bar {
+    background-color: white;
+    /* height: 40px;
+    flex-grow: 1; */
+
+    /* width: 1000px;
+    height: 40px; */
+    border-radius: 10px;
+    border: 2px solid black
+}
+
+#game-page {
+
+}
+
+#games {
+    width: 100%;
+    /* height: 100%; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    /* background-color: green; */
+    
+}
+#games > div {
+    height: 100%;
+}
+
+#main-game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+}
+
+#other-games-left, #other-games-right {
+    flex-grow: 1;
+    /* background-color: green; */
+    display: flex;
+    flex-wrap: wrap;
+    /* align-items: center; */
+    justify-content: space-evenly;
+}
+
+.game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.user {
+    /* border: 2px solid white; */
+    /* padding: 5px; */
+    /* border-radius: 10px; */
+}
+.user > span {
+    white-space: pre;
+}
+
+/* .game:not(.other) > .user, .score:not(.other) > .user {
+    border: 2px solid black;
+} */
+.game:not(.other) > .user > span:first-of-type:after, .score:not(.other) > .user > span:first-of-type:after {
+    content: " (You)";
+    color: #a4a4a4 !important
+}
+
+
+#header {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    min-height: 50px;
+}
+
+#title {
+    position: absolute;
+    font-size: 40px;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#room-options {
+    display: none;
+    margin-left: auto;
+    height: 100%;
+    padding: 5px;
+}
+
+#start-btn {
+    width: 100px;
+    font-size: 25px;
+}
+
+.user, #main-game > .game > .user::after {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.game.other > .user > span {
+    /* background-color: blue !important; */
+}
+
+.board {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+}
+
+.row {
+    display: flex;
+    gap: 5px;
+}
+
+.row > .letter {
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+
+    width: 55px;
+    height: 55px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 2px solid #d3d6da;
+}
+
+.row > .letter.correct {
+    border: 2px solid #6aaa64 !important;
+    background-color: #6aaa64 !important;
+    color: white !important;
+}
+.row > .letter.present {
+    border: 2px solid #c9b458 !important;
+    background-color: #c9b458 !important;
+    color: white !important;
+}
+.row > .letter.absent {
+    border: 2px solid #787c7e !important;
+    background-color: #787c7e !important;
+    color: white !important;
+}
+.row > .letter.filled {
+    border: 2px solid #878a8c;
+}
+
+.row > .letter > span {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+
+
+.page {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+#center {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+    padding-top: 10%;
+}
+#center > button {
+    font-size: 50px;
+    width: 40%;
+    height: 30%;
+}
+
+
+
+
+#join-btn > input {
+    font-size: 50px;
+    width: 50%;
+    text-align: center;
+}
+
+
+#console {
+    position: absolute;
+    background-color: rgb(211, 211, 211);
+    border: 2px solid black;
+    flex-direction: column;
+    font-family: Consolas, monaco, monospace;
+    display: none;
+    max-height: 500px;
+    max-width: 500px;
+    color: black !important;
+}
+.visible {
+    display: flex !important;
+}
+
+.console > .controls {
+    /* position: relative; */
+    user-select: none;
+
+
+}
+
+.console > .controls.top {
+    /* position: absolute; */
+    height: 15px;
+    background-color: rgb(95, 95, 95);
+    /* width: 100%; */
+    border-bottom: 2px solid black;
+    padding: 2px;
+    color: rgb(255, 255, 255);
+}
+
+.console > .controls.bottom {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    bottom: 0;
+}
+
+.console > .controls.bottom.right {
+    right: 0;
+    transform: translate(5px, 5px);
+    cursor: nwse-resize;
+}
+.console > .console.output {
+    /* white-space: nowrap; */
+    padding: 5px;
+    overflow-y: scroll;
+}
